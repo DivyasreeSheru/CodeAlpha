@@ -1,18 +1,50 @@
-const form = document.getElementById('ageForm');
-const result = document.getElementById('result');
+document.addEventListener('DOMContentLoaded', () => {
+    const taskInput = document.getElementById('taskInput');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskList = document.getElementById('taskList');
 
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const dob = new Date(document.getElementById('dob').value);
-    if (isNaN(dob)) {
-        result.textContent = 'Invalid date. Please try again.';
-        return;
+    
+    loadTasks();
+
+   
+    addTaskBtn.addEventListener('click', () => {
+        const taskText = taskInput.value.trim();
+        if (taskText) {
+            addTask(taskText);
+            taskInput.value = '';
+        }
+    });
+
+
+    function addTask(taskText) {
+        const li = document.createElement('li');
+        li.textContent = taskText;
+
+   
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', () => {
+            li.remove();
+            saveTasks();
+        });
+
+        li.appendChild(deleteBtn);
+        taskList.appendChild(li);
+        saveTasks();
     }
-    const today = new Date();
-    let age = today.getFullYear() - dob.getFullYear();
-    const monthDiff = today.getMonth() - dob.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-        age--;
+
+   
+    function saveTasks() {
+        const tasks = [];
+        document.querySelectorAll('li').forEach(li => {
+            tasks.push(li.firstChild.textContent);
+        });
+        localStorage.setItem('tasks', JSON.stringify(tasks));
     }
-    result.textContent = `Your age is ${age} years.`;
+
+   
+    function loadTasks() {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.forEach(task => addTask(task));
+    }
 });
